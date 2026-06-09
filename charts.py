@@ -124,3 +124,19 @@ def draw_bonus_bubble_chart(df):
     ax.grid(True, linestyle='--', alpha=0.5)
     
     return fig
+    # --- Interactive Data Explorer Pane ---
+st.markdown("<span class='section-title'>🔍 Live Passenger Data Explorer</span>", unsafe_allow_html=True)
+st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
+
+# Search Input
+search_query = st.text_input("Search Passenger by Name (Real-time Filter):", "").strip()
+
+# Apply search filter if text is entered
+if search_query:
+    display_df = filtered_df[filtered_df['name'].str.contains(search_query, case=False, na=False)]
+else:
+    display_df = filtered_df
+
+# Display dataframe with premium styling
+st.dataframe(display_df.head(100), use_container_width=True)
+st.caption(f"Showing {len(display_df)} rows based on current active filters and search query.")
