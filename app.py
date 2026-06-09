@@ -350,3 +350,37 @@ with chart_col2:
         st.pyplot(fig_bonus)
     else:
         st.info("Required columns (Age/Fare) are missing or empty.")
+        # --- AI Survival Predictor Tool ---
+st.markdown("<span class='section-title'>🤖 AI Executive Decision Tool: Survival Predictor</span>", unsafe_allow_html=True)
+st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
+
+# User inputs for the AI tool
+st.subheader("Enter Passenger Details to Predict Survival Probability:")
+ai_col1, ai_col2, ai_col3 = st.columns(3)
+
+with ai_col1:
+    ai_gender = st.selectbox("Select Gender for Prediction:", ["male", "female"])
+with ai_col2:
+    ai_class = st.selectbox("Select Ticket Class for Prediction:", [1, 2, 3])
+with ai_col3:
+    ai_age = st.slider("Select Age for Prediction:", 1, 80, 30)
+
+# Predictive logic based on historical data patterns
+if st.button("Run AI Survival Prediction 🚀"):
+    # High probability rules based on historical Titanic data
+    if ai_gender == "female":
+        if ai_class in [1, 2]:
+            survival_chance = "HIGH (85% - 95%)"
+            result_color = "green"
+        else:
+            survival_chance = "MEDIUM (50% - 60%)"
+            result_color = "orange"
+    else: # male
+        if ai_class == 1 and ai_age < 18:
+            survival_chance = "MEDIUM (40% - 50%)"
+            result_color = "orange"
+        else:
+            survival_chance = "LOW (10% - 20%)"
+            result_color = "red"
+            
+    st.markdown(f"### AI Prediction Result: **Passenger has a <span style='color:{result_color}'>{survival_chance}</span> chance of survival.**", unsafe_allow_html=True)
