@@ -223,7 +223,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
-
+st.write("""
+This interactive Executive Dashboard delivers an end-to-end Exploratory Data Analysis (EDA) of the Titanic dataset. 
+By integrating real-time demographic and socio-economic filters, it uncovers hidden survival patterns and historical insights. 
+Designed for decision-makers to transform raw historical data into structured, actionable visual intelligence.
+""")
 df = pd.read_csv('data/titanic.csv')
 
 # Sidebar Controls Layout
