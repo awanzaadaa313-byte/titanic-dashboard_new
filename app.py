@@ -74,7 +74,7 @@ st.markdown("""
         left: 0;
         width: 100%;
         height: 6px;
-        background:#1a1a1a !important;
+        background:linear-gradient(90deg, #001f54, #00b4d8, #00f5d4) !important;
         z-index: 9999;
     }
     header[data-testid="stHeader"] { background-color: transparent !important; }
