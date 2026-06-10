@@ -6,7 +6,7 @@ def apply_chart_style(fig, ax, title, xlabel="", ylabel=""):
     ax.set_facecolor('#161b22')
     
     # Graphs Titles: Forced to Red-Pink-Orange mix color scheme
-    ax.set_title(title, fontsize=12, fontweight='bold', pad=25, color='#ff007f', 
+    ax.set_title(title, fontsize=12, fontweight='bold', pad=30, color='#ff007f', 
                  bbox=dict(facecolor='none', edgecolor='#ff4500', pad=4, linewidth=1)) 
     
     if xlabel: ax.set_xlabel(xlabel, fontsize=10, color='#ff3333', labelpad=8, fontweight='bold')
@@ -38,9 +38,9 @@ def draw_pie_chart(df):
                textprops=dict(color="#ffffff", weight="bold", fontsize=10),
                wedgeprops=dict(width=0.45, edgecolor='#0e1117', linewidth=3))
     
-    # Adding clear color guide line at the top
-    ax.text(0.5, 1.15, "🔴 Red = Deceased | 💗 Pink = Survived", 
-            transform=ax.transAxes, color='#ffffff', fontsize=9, weight='bold', ha='center')
+    # FIX: Using suptitle with perfect Y-positioning so it never overlaps the box title
+    fig.suptitle("🔴 Red = Deceased  |  💗 Pink = Survived", 
+                 color='#ffffff', fontsize=10, weight='bold', y=0.85)
     
     apply_chart_style(fig, ax, 'Survival Rate Status')
     return fig
@@ -58,7 +58,6 @@ def draw_age_dist(df):
 def draw_scatter_fare_age(df):
     fig, ax = plt.subplots(figsize=(6, 4))
     if not df.empty:
-        # Check column cases dynamically
         surv_col = 'survived' if 'survived' in df.columns else ('Survived' if 'Survived' in df.columns else None)
         age_col = 'age' if 'age' in df.columns else ('Age' if 'Age' in df.columns else 'age')
         fare_col = 'fare' if 'fare' in df.columns else ('Fare' if 'Fare' in df.columns else 'fare')
@@ -67,10 +66,10 @@ def draw_scatter_fare_age(df):
         legend = ax.legend(title='Status', facecolor='#0e1117', edgecolor='none')
         plt.setp(legend.get_texts(), color='#8b949e')
     
-    # Adding clear color guide line at the top
-    ax.text(0.5, 1.03, "🟡 Yellow = Deceased (0) | 🔵 Blue = Survived (1)", 
-            transform=ax.transAxes, color='#ffffff', fontsize=9, weight='bold', ha='center')
-            
+    # FIX: Subtitle added safely below the boxed title header
+    fig.suptitle("🟡 Yellow = Deceased (0)  |  🔵 Blue = Survived (1)", 
+                 color='#ffffff', fontsize=10, weight='bold', y=0.85)
+                 
     apply_chart_style(fig, ax, 'Passenger Fare vs Age', 'Age', 'Fare')
     return fig
 
@@ -81,19 +80,16 @@ def draw_gender_survival(df):
         legend = ax.legend(labels=['Deceased', 'Survived'], facecolor='#0e1117', edgecolor='none')
         plt.setp(legend.get_texts(), color='#8b949e')
         
-    # Adding clear color guide line at the top
-    ax.text(0.5, 1.03, "🟢 Teal = Deceased (0) | 🟡 Yellow = Survived (1)", 
-            transform=ax.transAxes, color='#ffffff', fontsize=9, weight='bold', ha='center')
-            
+    # FIX: Subtitle alignment fix
+    fig.suptitle("🟢 Teal = Deceased (0)  |  🟡 Yellow = Survived (1)", 
+                 color='#ffffff', fontsize=10, weight='bold', y=0.85)
+                 
     apply_chart_style(fig, ax, 'Survival Count by Gender', 'Gender', 'Count')
     return fig
 
 def draw_embark_count(df):
     fig, ax = plt.subplots(figsize=(6, 4))
-    
-    # Support both 'embarked' or 'embark_town' columns safely
     emb_col = 'embarked' if 'embarked' in df.columns else ('embark_town' if 'embark_town' in df.columns else None)
-    
     if not df.empty and emb_col:
         sns.countplot(data=df, x=emb_col, ax=ax, palette=['#ff3333', '#ff007f', '#ff758f'], edgecolor='#ffffff')
     apply_chart_style(fig, ax, 'Passengers per Embarkation Port', 'Port of Embarkation', 'Count')
@@ -113,10 +109,10 @@ def draw_age_violin(df):
         legend = ax.legend(facecolor='#0e1117', edgecolor='none')
         plt.setp(legend.get_texts(), color='#8b949e')
         
-    # Adding clear color guide line at the top
-    ax.text(0.5, 1.03, "💗 Pink = Deceased (0) | 🟡 Yellow = Survived (1)", 
-            transform=ax.transAxes, color='#ffffff', fontsize=9, weight='bold', ha='center')
-            
+    # FIX: Subtitle alignment fix
+    fig.suptitle("💗 Pink = Deceased (0)  |  🟡 Yellow = Survived (1)", 
+                 color='#ffffff', fontsize=10, weight='bold', y=0.85)
+                 
     apply_chart_style(fig, ax, 'Age Distribution by Class & Survival', 'Ticket Class', 'Age')
     return fig
 
@@ -136,8 +132,6 @@ def draw_parch_count(df):
 
 def draw_bonus_bubble_chart(df):
     fig, ax = plt.subplots(figsize=(6, 4))
-    
-    # Align capitalization variant keys dynamically
     age_col = 'Age' if 'Age' in df.columns else 'age'
     fare_col = 'Fare' if 'Fare' in df.columns else 'fare'
     pclass_col = 'Pclass' if 'Pclass' in df.columns else 'pclass'
@@ -154,9 +148,9 @@ def draw_bonus_bubble_chart(df):
             edgecolors="white"
         )
         
-    # Adding clear color guide line at the top for cold-warm logic
-    ax.text(0.5, 1.03, "💙 Blue Tone = Deceased (0) | ❤️ Red Tone = Survived (1)", 
-            transform=ax.transAxes, color='#ffffff', fontsize=9, weight='bold', ha='center')
+    # FIX: Clear coolwarm description subtitle
+    fig.suptitle("💙 Blue Tone = Deceased (0)  |  ❤️ Red Tone = Survived (1)", 
+                 color='#ffffff', fontsize=10, weight='bold', y=0.85)
             
     apply_chart_style(fig, ax, "Bonus Chart: Age vs Fare (Bubble Size by Pclass)", "Passenger Age", "Ticket Fare")
     return fig
