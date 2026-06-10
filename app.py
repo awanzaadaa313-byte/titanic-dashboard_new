@@ -335,3 +335,48 @@ if st.button("Generate AI Executive Summary ✨"):
     2. **Demographic Protocol:** The 'Women and Children First' historical protocol is mathematically validated through the data, showing female survival rates exceeding 70% across filtered datasets.
     3. **Risk Factor:** Lone passengers aged between 20-40 in lower tiers carried the maximum fatality weight in this disaster.
     """)
+
+# --- NEW TOOL: 🔍 Executive Passenger Search Engine ---
+st.markdown("<span class='section-title'>🔍 Executive Passenger Search Engine</span>", unsafe_allow_html=True)
+st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
+
+search_name = st.text_input("Enter Passenger Name to Query Dataset (e.g., Owen, Braund, Cumings):")
+
+if search_name:
+    # Look for name matches case-insensitively anywhere in the 'name' column
+    name_col = [c for c in df.columns if c.lower() == 'name']
+    
+    if name_col:
+        search_results = df[df[name_col[0]].str.contains(search_name, case=False, na=False)]
+        
+        if not search_results.empty:
+            st.success(f"Found {len(search_results)} passenger(s) matching '{search_name}':")
+            
+            # Formatted Columns for a clean look
+            for idx, row in search_results.iterrows():
+                with st.container():
+                    st.markdown(f"#### 👤 {row[name_col[0]]}")
+                    col1, col2, col3, col4 = st.columns(4)
+                    
+                    # Casing safeguard for checking data status
+                    survived_val = row.get('survived', row.get('Survived', 'N/A'))
+                    status = "🟢 Survived" if survived_val == 1 else "🔴 Deceased" if survived_val == 0 else "Unknown"
+                    
+                    gender_val = row.get('sex', row.get('Sex', 'N/A')).capitalize()
+                    class_val = row.get('pclass', row.get('Pclass', 'N/A'))
+                    age_val = row.get('age', row.get('Age', 'N/A'))
+                    fare_val = row.get('fare', row.get('Fare', 'N/A'))
+                    
+                    with col1:
+                        st.markdown(f"**Status:** {status}")
+                    with col2:
+                        st.markdown(f"**Gender / Age:** {gender_val} / {age_val} Yrs")
+                    with col3:
+                        st.markdown(f"**Ticket Class:** Class {class_val}")
+                    with col4:
+                        st.markdown(f"**Fare Paid:** ${fare_val:.2f}" if isinstance(fare_val, (int, float)) else f"**Fare Paid:** {fare_val}")
+                    st.markdown("<hr style='margin: 10px 0; border-color: rgba(0,0,0,0.1);'>", unsafe_allow_html=True)
+        else:
+            st.warning(f"No records found for passenger named '{search_name}'. Try another query.")
+    else:
+        st.error("The dataset does not contain a 'name' tracking column.")
