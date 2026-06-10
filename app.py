@@ -7,25 +7,25 @@ import charts as ch
 
 st.set_page_config(page_title="Ultra Luxury Titanic Dashboard", layout="wide")
 
-# --- Custom CSS for Pure White & Premium Clean Theme ---
+# --- Custom CSS for Black & White Mixed Premium Theme ---
 st.markdown(
     """
     <style>
-    /* Pure White Background for the entire application */
+    /* Beautiful White & Black Mixed (Light Charcoal/Gray) Background */
     .stApp {
-        background-color: #ffffff !important;
+        background-color: #eef1f6 !important;
         background-image: none !important;
     }
     
-    /* Matte Black Sidebar to give a clean separation */
+    /* Matte Black Sidebar to give a clean premium separation */
     [data-testid="stSidebar"] {
         background-color: #111111 !important;
         background-image: none !important;
     }
 
-    /* Professional Dark Charcoal text for clear data presentation over white background */
+    /* Professional Dark Bold Charcoal text for absolute clarity over mixed background */
     .stMarkdown, div[data-testid="stMetricValue"], h1, h2, h3, label, p {
-        color: #222222 !important;
+        color: #1a1c23 !important;
     }
     
     /* Elegant Sidebar Labels over Black */
@@ -142,12 +142,12 @@ st.markdown(
         display: block !important;
     }
 
-    /* Metric Layout Styling blocks */
+    /* Metric Layout Styling blocks (Pure White Cards over Mixed Gray Background) */
     div[data-testid="stMetricWidget"] {
-        background-color: #f8f9fa !important;
+        background-color: #ffffff !important;
         border: 2px solid #0077b6 !important;
         border-radius: 12px !important;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06) !important;
         padding: 15px !important;
     }
     div[data-testid="stMetricValue"] { 
@@ -252,9 +252,9 @@ with chart_col1:
         
         sns.countplot(x=filtered_df[surv_check[0]], palette=["#b80d22", "#2a9d8f"], ax=ax)
         ax.set_xticklabels(["Deceased (0)", "Survived (1)"])
-        ax.tick_params(colors='#222222')
-        ax.xaxis.label.set_color('#222222')
-        ax.yaxis.label.set_color('#222222')
+        ax.tick_params(colors='#1a1c23')
+        ax.xaxis.label.set_color('#1a1c23')
+        ax.yaxis.label.set_color('#1a1c23')
         st.pyplot(fig)
     else:
         st.info("Survival data column not tracked inside your current dataset.")
@@ -284,10 +284,10 @@ with chart_col2:
             linewidths=0.8
         )
         
-        ax_bonus.set_xlabel("Passenger Age", fontsize=10, color='#222222')
-        ax_bonus.set_ylabel("Ticket Fare (£)", fontsize=10, color='#222222')
-        ax_bonus.tick_params(colors='#222222')
-        ax_bonus.grid(True, color='#222222', alpha=0.15, linestyle='--')
+        ax_bonus.set_xlabel("Passenger Age", fontsize=10, color='#1a1c23')
+        ax_bonus.set_ylabel("Ticket Fare (£)", fontsize=10, color='#1a1c23')
+        ax_bonus.tick_params(colors='#1a1c23')
+        ax_bonus.grid(True, color='#1a1c23', alpha=0.15, linestyle='--')
 
         st.pyplot(fig_bonus)
     else:
