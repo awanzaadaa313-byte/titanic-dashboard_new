@@ -5,9 +5,8 @@ def apply_chart_style(fig, ax, title, xlabel="", ylabel=""):
     fig.patch.set_facecolor('#0e1117')
     ax.set_facecolor('#161b22')
     
-    # Graphs Titles: Forced to Red-Pink-Orange mix color scheme
-    # NOTE: Pad adjusted to 40 to give plenty of space for our custom subtitles
-    ax.set_title(title, fontsize=12, fontweight='bold', pad=40, color='#ff007f', 
+    # Main Box Title: یہ اب سب سے اوپر رہے گا
+    ax.set_title(title, fontsize=12, fontweight='bold', pad=45, color='#ff007f', 
                  bbox=dict(facecolor='none', edgecolor='#ff4500', pad=4, linewidth=1)) 
     
     if xlabel: ax.set_xlabel(xlabel, fontsize=10, color='#ff3333', labelpad=8, fontweight='bold')
@@ -39,11 +38,11 @@ def draw_pie_chart(df):
                textprops=dict(color="#ffffff", weight="bold", fontsize=10),
                wedgeprops=dict(width=0.45, edgecolor='#0e1117', linewidth=3))
     
-    # FIX: Added plenty of clear space (y=0.94) so it stays safely above the title box
-    fig.suptitle("🔴 Red = Deceased  |  💗 Pink = Survived", 
-                 color='#ffffff', fontsize=10, weight='bold', y=0.94)
-    
     apply_chart_style(fig, ax, 'Survival Rate Status')
+    
+    # FIX: یہ لائن اب مین باکس ٹائٹل کے نیچے اور گراف کے اوپر بالکل درمیان میں آئے گی
+    ax.text(0.5, 1.08, "🔴 Red = Deceased  |  💗 Pink = Survived", 
+            transform=ax.transAxes, color='#ffffff', fontsize=10, weight='bold', ha='center')
     return fig
 
 def draw_age_dist(df):
@@ -67,11 +66,11 @@ def draw_scatter_fare_age(df):
         legend = ax.legend(title='Status', facecolor='#0e1117', edgecolor='none')
         plt.setp(legend.get_texts(), color='#8b949e')
     
-    # FIX: Added perfect space above the boxed title
-    fig.suptitle("🟡 Yellow = Deceased (0)  |  🔵 Blue = Survived (1)", 
-                 color='#ffffff', fontsize=10, weight='bold', y=0.94)
-                 
     apply_chart_style(fig, ax, 'Passenger Fare vs Age', 'Age', 'Fare')
+    
+    # FIX: یہ لائن اب مین باکس ٹائٹل کے نیچے شو ہوگی
+    ax.text(0.5, 1.08, "🟡 Yellow = Deceased (0)  |  🔵 Blue = Survived (1)", 
+            transform=ax.transAxes, color='#ffffff', fontsize=10, weight='bold', ha='center')
     return fig
 
 def draw_gender_survival(df):
@@ -81,11 +80,11 @@ def draw_gender_survival(df):
         legend = ax.legend(labels=['Deceased', 'Survived'], facecolor='#0e1117', edgecolor='none')
         plt.setp(legend.get_texts(), color='#8b949e')
         
-    # FIX: Added perfect space above the boxed title
-    fig.suptitle("🟢 Teal = Deceased (0)  |  🟡 Yellow = Survived (1)", 
-                 color='#ffffff', fontsize=10, weight='bold', y=0.94)
-                 
     apply_chart_style(fig, ax, 'Survival Count by Gender', 'Gender', 'Count')
+    
+    # FIX: یہ لائن اب مین باکس ٹائٹل کے نیچے شو ہوگی
+    ax.text(0.5, 1.08, "🟢 Teal = Deceased (0)  |  🟡 Yellow = Survived (1)", 
+            transform=ax.transAxes, color='#ffffff', fontsize=10, weight='bold', ha='center')
     return fig
 
 def draw_embark_count(df):
@@ -110,11 +109,11 @@ def draw_age_violin(df):
         legend = ax.legend(facecolor='#0e1117', edgecolor='none')
         plt.setp(legend.get_texts(), color='#8b949e')
         
-    # FIX: Added perfect space above the boxed title
-    fig.suptitle("💗 Pink = Deceased (0)  |  🟡 Yellow = Survived (1)", 
-                 color='#ffffff', fontsize=10, weight='bold', y=0.94)
-                 
     apply_chart_style(fig, ax, 'Age Distribution by Class & Survival', 'Ticket Class', 'Age')
+    
+    # FIX: یہ لائن اب مین باکس ٹائٹل کے نیچے شو ہوگی
+    ax.text(0.5, 1.08, "💗 Pink = Deceased (0)  |  🟡 Yellow = Survived (1)", 
+            transform=ax.transAxes, color='#ffffff', fontsize=10, weight='bold', ha='center')
     return fig
 
 def draw_sibsp_count(df):
@@ -149,9 +148,9 @@ def draw_bonus_bubble_chart(df):
             edgecolors="white"
         )
         
-    # FIX: Clear coolwarm description subtitle with clean spacing
-    fig.suptitle("💙 Blue Tone = Deceased (0)  |  ❤️ Red Tone = Survived (1)", 
-                 color='#ffffff', fontsize=10, weight='bold', y=0.94)
-            
     apply_chart_style(fig, ax, "Bonus Chart: Age vs Fare (Bubble Size by Pclass)", "Passenger Age", "Ticket Fare")
+    
+    # FIX: یہ لائن اب مین باکس ٹائٹل کے نیچے شو ہوگی
+    ax.text(0.5, 1.08, "💙 Blue Tone = Deceased (0)  |  ❤️ Red Tone = Survived (1)", 
+            transform=ax.transAxes, color='#ffffff', fontsize=10, weight='bold', ha='center')
     return fig
