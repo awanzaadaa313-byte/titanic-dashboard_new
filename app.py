@@ -6,7 +6,7 @@ st.markdown(
     <style>
     /* Premium Black to Deep Red Gradient */
     .stApp {
-        background: linear-gradient(135deg, #000000 0%, #310404 60%, #6f0000 100%) !important;
+        background:#1a1a1a !important;
     }
     
     /* Matte Black Sidebar to give a clean separation */
