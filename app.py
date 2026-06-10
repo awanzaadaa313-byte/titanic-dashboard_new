@@ -81,6 +81,20 @@ st.markdown(
         margin-bottom: 5px !important;
     }
 
+    /* Chart Titles styling to match exactly with Sir's requirements */
+    .chart-header {
+        font-family: 'Segoe UI', system-ui, sans-serif !important;
+        font-weight: 800 !important;
+        font-size: 19px !important;
+        color: #002d62 !important;
+        background-color: #ffffff !important;
+        padding: 8px 12px !important;
+        border-left: 5px solid #ff3333 !important;
+        border-radius: 4px !important;
+        margin-bottom: 10px !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+    }
+
     .heading-line-1 {
         height: 3px !important;
         background: linear-gradient(90deg, #002d62, #00f5d4) !important;
@@ -248,7 +262,7 @@ with col_kpi3:
 
 
 # ==========================================
-# SECTION 2: AI TOOLS & EXPLORER SECTION (KPIs کے نیچے)
+# SECTION 2: AI TOOLS & EXPLORER SECTION
 # ==========================================
 # --- AI Survival Predictor Tool ---
 st.markdown("<span class='section-title'>🤖 AI Executive Decision Tool: Survival Predictor</span>", unsafe_allow_html=True)
@@ -340,7 +354,7 @@ if search_idx:
 
 
 # ==========================================
-# SECTION 3: GRAPHS & ADVANCED VISUALIZATION (سب سے نیچے)
+# SECTION 3: GRAPHS & ADVANCED VISUALIZATION (سر کی لسٹ کے ناموں کے ساتھ)
 # ==========================================
 st.markdown("<span class='section-title'>Advanced Data Visualization Grid (10 Unique Charts)</span>", unsafe_allow_html=True)
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
@@ -348,19 +362,19 @@ st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div
 # --- Row 1: Charts 1 & 2 ---
 row1_col1, row1_col2 = st.columns(2)
 with row1_col1:
-    st.subheader("1. Passenger Distribution by Ticket Class (Bar Chart)")
+    st.markdown("<div class='chart-header'>📊 Chart 1: Bar Chart of Passenger Class Counts</div>", unsafe_allow_html=True)
     st.pyplot(ch.draw_bar_chart(filtered_df))
 with row1_col2:
-    st.subheader("2. Overall Survival vs Fatality Ratio (Pie Chart)")
+    st.markdown("<div class='chart-header'>🍰 Chart 2: Pie Chart of Passenger Survival Status</div>", unsafe_allow_html=True)
     st.pyplot(ch.draw_pie_chart(filtered_df))
 
 # --- Row 2: Charts 3 & 4 ---
 row2_col1, row2_col2 = st.columns(2)
 with row2_col1:
-    st.subheader("3. Passenger Age Demographic Density (Distribution Plot)")
+    st.markdown("<div class='chart-header'>📈 Chart 3: Histogram of Passenger Ages</div>", unsafe_allow_html=True)
     st.pyplot(ch.draw_age_dist(filtered_df))
 with row2_col2:
-    st.subheader("4. Correlation Analysis: Ticket Fare vs Passenger Age (Scatter Plot)")
+    st.markdown("<div class='chart-header'>🎯 Chart 4: Scatter Plot of Age vs Fare Paid</div>", unsafe_allow_html=True)
     st.pyplot(ch.draw_scatter_fare_age(filtered_df))
 
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
@@ -368,19 +382,19 @@ st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div
 # --- Row 3: Charts 5 & 6 ---
 row3_col1, row3_col2 = st.columns(2)
 with row3_col1:
-    st.subheader("5. Survival Rate Analysis by Gender (Categorical Plot)")
+    st.markdown("<div class='chart-header'>👥 Chart 5: Stacked Bar Chart of Survival by Gender</div>", unsafe_allow_html=True)
     st.pyplot(ch.draw_gender_survival(filtered_df))
 with row3_col2:
-    st.subheader("6. Passenger Count by Port of Embarkation (Count Plot)")
+    st.markdown("<div class='chart-header'>⚓ Chart 6: Count Plot of Embarkation Towns</div>", unsafe_allow_html=True)
     st.pyplot(ch.draw_embark_count(filtered_df))
 
 # --- Row 4: Charts 7 & 8 ---
 row4_col1, row4_col2 = st.columns(2)
 with row4_col1:
-    st.subheader("7. Fare Range & Outlier Detection by Class (Box Plot)")
+    st.markdown("<div class='chart-header'>📦 Chart 7: Box Plot of Fares by Passenger Class</div>", unsafe_allow_html=True)
     st.pyplot(ch.draw_fare_box(filtered_df))
 with row4_col2:
-    st.subheader("8. Age Spread and Volume by Survival Status (Violin Plot)")
+    st.markdown("<div class='chart-header'>🎻 Chart 8: Violin Plot of Age vs Survival Status</div>", unsafe_allow_html=True)
     st.pyplot(ch.draw_age_violin(filtered_df))
 
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
@@ -388,10 +402,10 @@ st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div
 # --- Row 5: Charts 9 & 10 ---
 row5_col1, row5_col2 = st.columns(2)
 with row5_col1:
-    st.subheader("9. Sibling / Spouse Co-traveler Distribution (SibSp Count)")
+    st.markdown("<div class='chart-header'>👨‍👩‍👦 Chart 9: Count Plot of Sibling/Spouse Aboard</div>", unsafe_allow_html=True)
     st.pyplot(ch.draw_sibsp_count(filtered_df))
 with row5_col2:
-    st.subheader("10. Parent / Children Family Size Distribution (Parch Count)")
+    st.markdown("<div class='chart-header'>👪 Chart 10: Count Plot of Parent/Children Aboard</div>", unsafe_allow_html=True)
     st.pyplot(ch.draw_parch_count(filtered_df))
 
 
