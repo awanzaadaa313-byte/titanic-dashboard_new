@@ -48,7 +48,7 @@ st.markdown(
     }
     header[data-testid="stHeader"] { background-color: transparent !important; }
 
-    /* TITANIC MAIN TITLE: Hard Mix of Dark Blue and Green flowing within EVERY SINGLE WORD */
+    /* TITANIC MAIN TITLE */
     .word-gradient {
         font-family: 'Segoe UI', system-ui, sans-serif !important;
         font-weight: 900 !important;
@@ -60,7 +60,6 @@ st.markdown(
         margin-right: 12px !important;
     }
     
-    /* Clean & Clear Ship Design Container */
     .ship-icon {
         font-size: 44px !important;
         margin-right: 15px !important;
@@ -82,7 +81,6 @@ st.markdown(
         margin-bottom: 5px !important;
     }
 
-    /* Custom Layout Separation Lines matching the new style */
     .heading-line-1 {
         height: 3px !important;
         background: linear-gradient(90deg, #002d62, #00f5d4) !important;
@@ -96,12 +94,10 @@ st.markdown(
         border: none !important;
     }
 
-    /* CRITICAL SIDEBAR VISIBILITY FIX */
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #d94156 0%, #ff3333 100%) !important;
     }
     
-    /* Global Filters Heading Styling */
     .sidebar-global-heading {
         font-family: 'Segoe UI', system-ui, sans-serif !important;
         font-weight: 900 !important;
@@ -115,7 +111,6 @@ st.markdown(
         display: block !important;
     }
     
-    /* Dropdown field inputs styles */
     div[data-baseweb="select"] > div { 
         background-color: #ffb703 !important; 
         border: 2px solid #000000 !important; 
@@ -125,10 +120,7 @@ st.markdown(
         font-weight: 900 !important;
     }
 
-    /* LABELS OVER KPI METRICS */
-    [data-testid="stMetricLabel"],
-    [data-testid="stMetricLabel"] > div,
-    [data-testid="stMetricLabel"] p {
+    [data-testid="stMetricLabel"], [data-testid="stMetricLabel"] > div, [data-testid="stMetricLabel"] p {
         font-size: 15px !important; 
         font-weight: 900 !important;
         text-transform: uppercase !important;
@@ -142,7 +134,6 @@ st.markdown(
         display: block !important;
     }
 
-    /* Metric Layout Styling blocks (Pure White Cards over Mixed Gray Background) */
     div[data-testid="stMetricWidget"] {
         background-color: #ffffff !important;
         border: 2px solid #0077b6 !important;
@@ -155,6 +146,15 @@ st.markdown(
         font-weight: 900 !important; 
         color: #002d62 !important;  
         text-shadow: none !important; 
+    }
+    
+    /* Executive Card Wrapper for Outliers */
+    .anomaly-box {
+        background-color: #fff3cd;
+        border-left: 6px solid #ffc107;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -186,6 +186,19 @@ gender = st.sidebar.selectbox("Passenger Gender Selection:", ["All"] + list(df['
 pclass = st.sidebar.selectbox("Ticket Class Tier:", ["All"] + [str(c) for c in sorted(df['pclass'].unique())])
 
 filtered_df = apply_filters(df, gender, pclass)
+
+# --- FACTOR 1: 💡 AUTOMATED ANOMALY & OUTLIER DETECTOR ---
+if not filtered_df.empty:
+    max_fare_row = filtered_df.loc[filtered_df['fare'].idxmax()]
+    max_age_row = filtered_df.loc[filtered_df['age'].idxmax()]
+    
+    st.markdown(f"""
+    <div class='anomaly-box'>
+        <strong>⚠️ Executive Intelligence Alerts (Outlier Analysis):</strong><br>
+        • 💸 <b>Highest Fare in Selection:</b> <i>{max_fare_row['name']}</i> paid an extraordinary amount of <b>${max_fare_row['fare']:.2f}</b>.<br>
+        • 🧓 <b>Oldest Passenger in Selection:</b> <i>{max_age_row['name']}</i> logged at <b>{max_age_row['age']:.1f} years old</b>.
+    </div>
+    """, unsafe_allow_html=True)
 
 # Metrics Grid Display Block
 st.markdown("<span class='section-title'>Key Performance Indicators (KPIs)</span>", unsafe_allow_html=True)
@@ -336,14 +349,13 @@ if st.button("Generate AI Executive Summary ✨"):
     3. **Risk Factor:** Lone passengers aged between 20-40 in lower tiers carried the maximum fatality weight in this disaster.
     """)
 
-# --- NEW TOOL: 🔍 Executive Passenger Search Engine ---
+# --- Executive Passenger Search Engine ---
 st.markdown("<span class='section-title'>🔍 Executive Passenger Search Engine</span>", unsafe_allow_html=True)
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
 
 search_name = st.text_input("Enter Passenger Name to Query Dataset (e.g., Owen, Braund, Cumings):")
 
 if search_name:
-    # Look for name matches case-insensitively anywhere in the 'name' column
     name_col = [c for c in df.columns if c.lower() == 'name']
     
     if name_col:
@@ -352,13 +364,11 @@ if search_name:
         if not search_results.empty:
             st.success(f"Found {len(search_results)} passenger(s) matching '{search_name}':")
             
-            # Formatted Columns for a clean look
             for idx, row in search_results.iterrows():
                 with st.container():
                     st.markdown(f"#### 👤 {row[name_col[0]]}")
                     col1, col2, col3, col4 = st.columns(4)
                     
-                    # Casing safeguard for checking data status
                     survived_val = row.get('survived', row.get('Survived', 'N/A'))
                     status = "🟢 Survived" if survived_val == 1 else "🔴 Deceased" if survived_val == 0 else "Unknown"
                     
@@ -380,3 +390,18 @@ if search_name:
             st.warning(f"No records found for passenger named '{search_name}'. Try another query.")
     else:
         st.error("The dataset does not contain a 'name' tracking column.")
+
+# --- FACTOR 2: 📥 LIVE INTERACTIVE DATA EXPORT TOOL ---
+st.markdown("<span class='section-title'>📥 Executive Data Export Center</span>", unsafe_allow_html=True)
+st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
+st.write("Download the currently filtered dataset directly into a clean CSV sheet for localized spreadsheet operations:")
+
+# Converts current filtered dataframe to CSV format in-memory
+csv_data = filtered_df.to_csv(index=False).encode('utf-8')
+
+st.download_button(
+    label="Export Filtered Dataset to CSV 📄",
+    data=csv_data,
+    file_name='titanic_filtered_executive_report.csv',
+    mime='text/csv',
+)
