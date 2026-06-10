@@ -193,7 +193,7 @@ pclass = st.sidebar.selectbox("Ticket Class Tier:", ["All"] + [str(c) for c in s
 
 filtered_df = apply_filters(df, gender, pclass)
 
-# --- AUTOMATED ANOMALY & OUTLIER DETECTOR (Protected Code Block) ---
+# --- AUTOMATED ANOMALY & OUTLIER DETECTOR ---
 if not filtered_df.empty and fare_c in filtered_df.columns and age_c in filtered_df.columns:
     try:
         valid_fare_df = filtered_df.dropna(subset=[fare_c])
@@ -229,7 +229,10 @@ if not filtered_df.empty and fare_c in filtered_df.columns and age_c in filtered
 else:
     st.warning("⚠️ Selected filter combination returned no passenger records. Please adjust your sidebar filters.")
 
-# Metrics Grid Display Block
+
+# ==========================================
+# SECTION 1: KEY PERFORMANCE INDICATORS (KPIs)
+# ==========================================
 st.markdown("<span class='section-title'>Key Performance Indicators (KPIs)</span>", unsafe_allow_html=True)
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
 
@@ -243,7 +246,102 @@ with col_kpi3:
     avg_age = filtered_df[age_c].mean() if not filtered_df.empty and age_c in filtered_df.columns else 0
     st.metric(label="Average Passenger Age", value=f"{avg_age:.1f} Yrs")
 
-# Charts Data Grid Panels Layout
+
+# ==========================================
+# SECTION 2: AI TOOLS & EXPLORER SECTION (KPIs کے نیچے)
+# ==========================================
+# --- AI Survival Predictor Tool ---
+st.markdown("<span class='section-title'>🤖 AI Executive Decision Tool: Survival Predictor</span>", unsafe_allow_html=True)
+st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
+
+st.subheader("Enter Passenger Details to Predict Survival Probability:")
+ai_col1, ai_col2, ai_col3 = st.columns(3)
+
+with ai_col1:
+    ai_gender = st.selectbox("Select Gender for Prediction:", ["male", "female"])
+with ai_col2:
+    ai_class = st.selectbox("Select Ticket Class for Prediction:", [1, 2, 3])
+with ai_col3:
+    ai_age = st.slider("Select Age for Prediction:", 1, 80, 30)
+
+if st.button("Run AI Survival Prediction 🚀"):
+    if ai_gender == "female":
+        if ai_class in [1, 2]:
+            survival_chance = "HIGH (85% - 95%)"
+            result_color = "green"
+        else:
+            survival_chance = "MEDIUM (50% - 60%)"
+            result_color = "orange"
+    else: 
+        if ai_class == 1 and ai_age < 18:
+            survival_chance = "MEDIUM (40% - 50%)"
+            result_color = "orange"
+        else:
+            survival_chance = "LOW (10% - 20%)"
+            result_color = "red"
+            
+    st.markdown(f"### AI Prediction Result: **Passenger has a <span style='color:{result_color}'>{survival_chance}</span> chance of survival.**", unsafe_allow_html=True)
+
+# --- AI Executive Insights Generator ---
+st.markdown("<span class='section-title'>🧠 AI Executive Insights Generator</span>", unsafe_allow_html=True)
+
+if st.button("Generate AI Executive Summary ✨"):
+    st.info("""
+    **AI Automated Analysis:**
+    1. **Socio-Economic Bias Identified:** First Class passengers had a 3x higher survival probability compared to Third Class passengers, confirming economic class priority during evacuation.
+    2. **Demographic Protocol:** The 'Women and Children First' historical protocol is mathematically validated through the data, showing female survival rates exceeding 70% across filtered datasets.
+    3. **Risk Factor:** Lone passengers aged between 20-40 in lower tiers carried the maximum fatality weight in this disaster.
+    """)
+
+# --- Executive Passenger Record Explorer ---
+st.markdown("<span class='section-title'>🔍 Executive Passenger Record Explorer</span>", unsafe_allow_html=True)
+st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
+
+search_idx = st.text_input("Enter Passenger Row ID to Query Dataset (e.g., 0, 14, 50, 100):")
+
+if search_idx:
+    try:
+        idx_int = int(search_idx)
+        if idx_int in df.index:
+            row = df.loc[idx_int]
+            st.success(f"Found Record for Passenger Row ID: {idx_int}")
+            
+            with st.container():
+                st.markdown(f"#### 👤 Passenger Record #{idx_int}")
+                col1, col2, col3, col4 = st.columns(4)
+                
+                survived_val = row.get(survived_c, 'N/A')
+                status = "🟢 Survived" if survived_val == 1 else "🔴 Deceased" if survived_val == 0 else "Unknown"
+                
+                gender_val = str(row.get(sex_c, 'N/A')).capitalize()
+                class_val = row.get(pclass_c, 'N/A')
+                age_val = row.get(age_c, 'N/A')
+                fare_val = row.get(fare_c, 'N/A')
+                who_val = str(row.get('who', 'N/A')).capitalize()
+                embark_val = str(row.get('embark_town', 'N/A'))
+                
+                with col1:
+                    st.markdown(f"**Status:** {status}")
+                    st.markdown(f"**Demographic:** {who_val}")
+                with col2:
+                    st.markdown(f"**Gender:** {gender_val}")
+                    st.markdown(f"**Age:** {age_val} Yrs")
+                with col3:
+                    st.markdown(f"**Ticket Class:** Class {class_val}")
+                    st.markdown(f"**Embarked From:** {embark_val}")
+                with col4:
+                    st.markdown(f"**Fare Paid:** ${fare_val:.2f}" if isinstance(fare_val, (int, float)) else f"**Fare Paid:** {fare_val}")
+                    st.markdown(f"**Family:** SibSp: {row.get('sibsp',0)}, Parch: {row.get('parch',0)}")
+                st.markdown("<hr style='margin: 10px 0; border-color: rgba(0,0,0,0.1);'>", unsafe_allow_html=True)
+        else:
+            st.warning(f"No records found for Row ID {idx_int}. Valid range is 0 to {df.index.max()}.")
+    except ValueError:
+        st.error("Please enter a valid numeric Row ID.")
+
+
+# ==========================================
+# SECTION 3: GRAPHS & ADVANCED VISUALIZATION (سب سے نیچے)
+# ==========================================
 st.markdown("<span class='section-title'>Advanced Data Visualization Grid (10 Unique Charts)</span>", unsafe_allow_html=True)
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
 
@@ -328,100 +426,12 @@ with chart_col2:
     else:
         st.info("Required columns (Age/Fare) are missing or empty.")
 
-# --- AI Survival Predictor Tool ---
-st.markdown("<span class='section-title'>🤖 AI Executive Decision Tool: Survival Predictor</span>", unsafe_allow_html=True)
-st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
 
-st.subheader("Enter Passenger Details to Predict Survival Probability:")
-ai_col1, ai_col2, ai_col3 = st.columns(3)
-
-with ai_col1:
-    ai_gender = st.selectbox("Select Gender for Prediction:", ["male", "female"])
-with ai_col2:
-    ai_class = st.selectbox("Select Ticket Class for Prediction:", [1, 2, 3])
-with ai_col3:
-    ai_age = st.slider("Select Age for Prediction:", 1, 80, 30)
-
-if st.button("Run AI Survival Prediction 🚀"):
-    if ai_gender == "female":
-        if ai_class in [1, 2]:
-            survival_chance = "HIGH (85% - 95%)"
-            result_color = "green"
-        else:
-            survival_chance = "MEDIUM (50% - 60%)"
-            result_color = "orange"
-    else: 
-        if ai_class == 1 and ai_age < 18:
-            survival_chance = "MEDIUM (40% - 50%)"
-            result_color = "orange"
-        else:
-            survival_chance = "LOW (10% - 20%)"
-            result_color = "red"
-            
-    st.markdown(f"### AI Prediction Result: **Passenger has a <span style='color:{result_color}'>{survival_chance}</span> chance of survival.**", unsafe_allow_html=True)
-
-# --- AI Executive Insights Generator ---
-st.markdown("<span class='section-title'>🧠 AI Executive Insights Generator</span>", unsafe_allow_html=True)
-
-if st.button("Generate AI Executive Summary ✨"):
-    st.info("""
-    **AI Automated Analysis:**
-    1. **Socio-Economic Bias Identified:** First Class passengers had a 3x higher survival probability compared to Third Class passengers, confirming economic class priority during evacuation.
-    2. **Demographic Protocol:** The 'Women and Children First' historical protocol is mathematically validated through the data, showing female survival rates exceeding 70% across filtered datasets.
-    3. **Risk Factor:** Lone passengers aged between 20-40 in lower tiers carried the maximum fatality weight in this disaster.
-    """)
-
-# --- Executive Passenger Record Explorer (Optimized for No-Name Dataset) ---
-st.markdown("<span class='section-title'>🔍 Executive Passenger Record Explorer</span>", unsafe_allow_html=True)
-st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
-
-search_idx = st.text_input("Enter Passenger Row ID to Query Dataset (e.g., 0, 14, 50, 100):")
-
-if search_idx:
-    try:
-        idx_int = int(search_idx)
-        if idx_int in df.index:
-            row = df.loc[idx_int]
-            st.success(f"Found Record for Passenger Row ID: {idx_int}")
-            
-            with st.container():
-                st.markdown(f"#### 👤 Passenger Record #{idx_int}")
-                col1, col2, col3, col4 = st.columns(4)
-                
-                survived_val = row.get(survived_c, 'N/A')
-                status = "🟢 Survived" if survived_val == 1 else "🔴 Deceased" if survived_val == 0 else "Unknown"
-                
-                gender_val = str(row.get(sex_c, 'N/A')).capitalize()
-                class_val = row.get(pclass_c, 'N/A')
-                age_val = row.get(age_c, 'N/A')
-                fare_val = row.get(fare_c, 'N/A')
-                who_val = str(row.get('who', 'N/A')).capitalize()
-                embark_val = str(row.get('embark_town', 'N/A'))
-                
-                with col1:
-                    st.markdown(f"**Status:** {status}")
-                    st.markdown(f"**Demographic:** {who_val}")
-                with col2:
-                    st.markdown(f"**Gender:** {gender_val}")
-                    st.markdown(f"**Age:** {age_val} Yrs")
-                with col3:
-                    st.markdown(f"**Ticket Class:** Class {class_val}")
-                    st.markdown(f"**Embarked From:** {embark_val}")
-                with col4:
-                    st.markdown(f"**Fare Paid:** ${fare_val:.2f}" if isinstance(fare_val, (int, float)) else f"**Fare Paid:** {fare_val}")
-                    st.markdown(f"**Family:** SibSp: {row.get('sibsp',0)}, Parch: {row.get('parch',0)}")
-                st.markdown("<hr style='margin: 10px 0; border-color: rgba(0,0,0,0.1);'>", unsafe_allow_html=True)
-        else:
-            st.warning(f"No records found for Row ID {idx_int}. Valid range is 0 to {df.index.max()}.")
-    except ValueError:
-        st.error("Please enter a valid numeric Row ID.")
-
-# --- FACTOR 2: 📥 LIVE INTERACTIVE DATA EXPORT TOOL ---
+# --- DATA EXPORT CENTER ---
 st.markdown("<span class='section-title'>📥 Executive Data Export Center</span>", unsafe_allow_html=True)
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
 st.write("Download the currently filtered dataset directly into a clean CSV sheet for localized spreadsheet operations:")
 
-# Converts current filtered dataframe to CSV format in-memory
 csv_data = filtered_df.to_csv(index=False).encode('utf-8')
 
 st.download_button(
