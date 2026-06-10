@@ -103,8 +103,6 @@ st.markdown(
         font-weight: 900 !important;
         font-size: 26px !important;
         background: linear-gradient(90deg, #00f5d4 0%, #ffffff 100%) !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
         border-bottom: 3px solid #000000 !important;
         padding-bottom: 5px !important;
         margin-bottom: 20px !important;
@@ -180,14 +178,16 @@ Designed for decision-makers to transform raw historical data into structured, a
 
 df = pd.read_csv('data/titanic.csv')
 
-# --- DYNAMIC COLUMN NAME DETECTOR (To prevent KeyError case-sensitivity issues) ---
+# --- SMART COLUMN DETECTOR (Finds names even if column is 'PassengerName', 'full_name' etc.) ---
 col_map = {c.lower(): c for c in df.columns}
 fare_c = col_map.get('fare', 'fare')
 age_c = col_map.get('age', 'age')
-name_c = col_map.get('name', 'name')
 sex_c = col_map.get('sex', 'sex')
 pclass_c = col_map.get('pclass', 'pclass')
 survived_c = col_map.get('survived', 'survived')
+
+# Automatically find any column that contains 'name'
+name_c = next((c for c in df.columns if 'name' in c.lower()), None)
 
 # Sidebar Controls Layout
 st.sidebar.markdown("<span class='sidebar-global-heading'>Global Filters</span>", unsafe_allow_html=True)
@@ -196,14 +196,15 @@ pclass = st.sidebar.selectbox("Ticket Class Tier:", ["All"] + [str(c) for c in s
 
 filtered_df = apply_filters(df, gender, pclass)
 
-# --- FIXED FACTOR 1: 💡 AUTOMATED ANOMALY & OUTLIER DETECTOR ---
+# --- AUTOMATED ANOMALY & OUTLIER DETECTOR ---
 if not filtered_df.empty and fare_c in filtered_df.columns and age_c in filtered_df.columns:
     try:
         max_fare_row = filtered_df.loc[filtered_df[fare_c].idxmax()]
         max_age_row = filtered_df.loc[filtered_df[age_c].idxmax()]
         
-        passenger_max_fare = max_fare_row[name_c] if name_c in max_fare_row else "Unknown Passenger"
-        passenger_max_age = max_age_row[name_c] if name_c in max_age_row else "Unknown Passenger"
+        # Display name if column found, otherwise show cleaner identifier
+        passenger_max_fare = max_fare_row[name_c] if name_c else f"Passenger ID {max_fare_row.name}"
+        passenger_max_age = max_age_row[name_c] if name_c else f"Passenger ID {max_age_row.name}"
         
         st.markdown(f"""
         <div class='anomaly-box'>
@@ -366,7 +367,7 @@ st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div
 search_name = st.text_input("Enter Passenger Name to Query Dataset (e.g., Owen, Braund, Cumings):")
 
 if search_name:
-    if name_c in df.columns:
+    if name_c:
         search_results = df[df[name_c].str.contains(search_name, case=False, na=False)]
         
         if not search_results.empty:
