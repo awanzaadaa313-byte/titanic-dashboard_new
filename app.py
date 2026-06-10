@@ -1,12 +1,20 @@
 import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from filters import apply_filters
+import charts as ch
 
-# --- Custom CSS for Premium Black & Red Theme ---
+st.set_page_config(page_title="Ultra Luxury Titanic Dashboard", layout="wide")
+
+# --- Custom CSS for Pure White & Premium Clean Theme ---
 st.markdown(
     """
     <style>
-    /* Premium Black to Deep Red Gradient */
+    /* Pure White Background for the entire application */
     .stApp {
-        background:linear-gradient(90deg, #001f54, #00b4d8, #00f5d4) !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
     }
     
     /* Matte Black Sidebar to give a clean separation */
@@ -15,56 +23,17 @@ st.markdown(
         background-image: none !important;
     }
 
-    /* Crisp white text for clear data presentation */
-    .stMarkdown, div[data-testid="stMetricValue"], h1, h2, h3, label {
-        color: #ffffff !important;
+    /* Professional Dark Charcoal text for clear data presentation over white background */
+    .stMarkdown, div[data-testid="stMetricValue"], h1, h2, h3, label, p {
+        color: #222222 !important;
     }
     
-    /* Glassmorphism style border containers for your KPI metrics */
-    div[data-testid="metric-container"] {
-        background-color: rgba(255, 255, 255, 0.05) !important;
-        border-radius: 8px !important;
-        padding: 12px !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-# --- Your existing imports and code continue below ---
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-# ... (rest of your existing code continues down here)
-import streamlit as st
-import pandas as pd
-from filters import apply_filters
-import charts as ch
-
-st.set_page_config(page_title="Ultra Luxury Titanic Dashboard", layout="wide")
-
-# Heavy-Duty Forceful CSS Styles - Word-by-Word Dark Blue and Green Mix Gradient
-st.markdown("""
-    <style>
-    .stApp { 
-        background-color: #0e1117 !important; 
+    /* Elegant Sidebar Labels over Black */
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] label p,
+    section[data-testid="stSidebar"] div[data-testid="stWidgetLabel"] p {
+        color: #ffffff !important;
+        text-shadow: none !important;
     }
     
     header[data-testid="stHeader"]::before {
@@ -74,12 +43,12 @@ st.markdown("""
         left: 0;
         width: 100%;
         height: 6px;
-        background:linear-gradient(90deg, #001f54, #00b4d8, #00f5d4) !important;
+        background: linear-gradient(90deg, #001f54, #00b4d8, #00f5d4) !important;
         z-index: 9999;
     }
     header[data-testid="stHeader"] { background-color: transparent !important; }
 
-    /* 1. TITANIC MAIN TITLE: Hard Mix of Dark Blue and Green flowing within EVERY SINGLE WORD */
+    /* TITANIC MAIN TITLE: Hard Mix of Dark Blue and Green flowing within EVERY SINGLE WORD */
     .word-gradient {
         font-family: 'Segoe UI', system-ui, sans-serif !important;
         font-weight: 900 !important;
@@ -88,7 +57,7 @@ st.markdown("""
         -webkit-background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
         display: inline-block !important;
-        margin-right: 12px !important; /* Space between words */
+        margin-right: 12px !important;
     }
     
     /* Clean & Clear Ship Design Container */
@@ -97,7 +66,7 @@ st.markdown("""
         margin-right: 15px !important;
         vertical-align: middle !important;
         display: inline-block !important;
-        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) !important;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2)) !important;
     }
 
     /* Section Titles styling */
@@ -113,7 +82,7 @@ st.markdown("""
         margin-bottom: 5px !important;
     }
 
-    /* Custom Layout Separation Lines matching the new dark blue & green style */
+    /* Custom Layout Separation Lines matching the new style */
     .heading-line-1 {
         height: 3px !important;
         background: linear-gradient(90deg, #002d62, #00f5d4) !important;
@@ -145,23 +114,6 @@ st.markdown("""
         margin-bottom: 20px !important;
         display: block !important;
     }
-
-    /* All Selectbox Labels/Text over "All" */
-    section[data-testid="stSidebar"] label,
-    section[data-testid="stSidebar"] label p,
-    section[data-testid="stSidebar"] div[data-testid="stWidgetLabel"] p {
-        color: #000000 !important;
-        font-family: 'Segoe UI', system-ui, sans-serif !important;
-        font-size: 15px !important;
-        font-weight: 900 !important;
-        text-transform: uppercase !important;
-        background: none !important;
-        -webkit-text-fill-color: #000000 !important;
-        text-shadow: 1px 1px 0px #00f5d4 !important;
-        opacity: 1 !important;
-        display: block !important;
-        margin-bottom: 6px !important;
-    }
     
     /* Dropdown field inputs styles */
     div[data-baseweb="select"] > div { 
@@ -173,19 +125,15 @@ st.markdown("""
         font-weight: 900 !important;
     }
 
-    /* LABELS OVER 891 / DOLLARS */
+    /* LABELS OVER KPI METRICS */
     [data-testid="stMetricLabel"],
     [data-testid="stMetricLabel"] > div,
-    [data-testid="stMetricLabel"] p,
-    div[class*="st-emotion-cache"] label,
-    div[class*="stMetric"] label p,
-    .st-emotion-cache-1wivap2,
-    .st-emotion-cache-186bbyy p {
+    [data-testid="stMetricLabel"] p {
         font-size: 15px !important; 
         font-weight: 900 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.5px !important;
-        background: linear-gradient(90deg, #ff3333 0%, #00f5d4 100%) !important;
+        background: linear-gradient(90deg, #ff3333 0%, #002d62 100%) !important;
         -webkit-background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
         color: transparent !important;
@@ -196,22 +144,22 @@ st.markdown("""
 
     /* Metric Layout Styling blocks */
     div[data-testid="stMetricWidget"] {
-        background-color: #161b22 !important;
-        border: 2px solid #ff007f !important;
+        background-color: #f8f9fa !important;
+        border: 2px solid #0077b6 !important;
         border-radius: 12px !important;
-        box-shadow: 0 0 15px rgba(255, 0, 127, 0.4) !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
         padding: 15px !important;
     }
     div[data-testid="stMetricValue"] { 
         font-size: 45px !important; 
         font-weight: 900 !important; 
-        color: #ffb703 !important;  
-        text-shadow: 2px 2px #ff3333 !important; 
+        color: #002d62 !important;  
+        text-shadow: none !important; 
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Main Title Area: Word-by-word separation with custom Dark Blue to Green Gradient flow inside each word
+# Main Title Area
 st.markdown("""
     <div style='vertical-align: middle;'>
         <span class='ship-icon'>🚢</span>
@@ -223,11 +171,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
+
 st.write("""
 This interactive Executive Dashboard delivers an end-to-end Exploratory Data Analysis (EDA) of the Titanic dataset. 
 By integrating real-time demographic and socio-economic filters, it uncovers hidden survival patterns and historical insights. 
 Designed for decision-makers to transform raw historical data into structured, actionable visual intelligence.
 """)
+
 df = pd.read_csv('data/titanic.csv')
 
 # Sidebar Controls Layout
@@ -288,33 +238,29 @@ with row5_col1:
     st.pyplot(ch.draw_sibsp_count(filtered_df))
 with row5_col2:
     st.pyplot(ch.draw_parch_count(filtered_df))
-# --- Fixed: Matplotlib color formatting issue solved ---
+
 chart_col1, chart_col2 = st.columns(2)
 
 with chart_col1:
     st.subheader("Survival Distribution (Count)")
-    
-    # Automatically tracks survival column regardless of casing
     surv_check = [c for c in filtered_df.columns if c.lower() == 'survived']
     
     if not filtered_df.empty and surv_check:
         fig, ax = plt.subplots()
-        fig.patch.set_facecolor('none')  # Transparent plot container
+        fig.patch.set_facecolor('none')  
         ax.set_facecolor('none')
         
         sns.countplot(x=filtered_df[surv_check[0]], palette=["#b80d22", "#2a9d8f"], ax=ax)
         ax.set_xticklabels(["Deceased (0)", "Survived (1)"])
-        ax.tick_params(colors='white')
-        ax.xaxis.label.set_color('white')
-        ax.yaxis.label.set_color('white')
+        ax.tick_params(colors='#222222')
+        ax.xaxis.label.set_color('#222222')
+        ax.yaxis.label.set_color('#222222')
         st.pyplot(fig)
     else:
         st.info("Survival data column not tracked inside your current dataset.")
 
 with chart_col2:
     st.subheader("Bonus Bubble Chart: Age vs Fare")
-    
-    # Automatic case-insensitive matching for tracking table columns
     age_col = [c for c in filtered_df.columns if c.lower() == 'age']
     fare_col = [c for c in filtered_df.columns if c.lower() == 'fare']
     pclass_col = [c for c in filtered_df.columns if c.lower() == 'pclass']
@@ -322,10 +268,9 @@ with chart_col2:
 
     if not filtered_df.empty and age_col and fare_col:
         fig_bonus, ax_bonus = plt.subplots(figsize=(6, 4))
-        fig_bonus.patch.set_facecolor('none')  # Transparent background wrapper
+        fig_bonus.patch.set_facecolor('none')  
         ax_bonus.set_facecolor('none')
         
-        # Mapping scatter layout structures safely
         sizes = filtered_df[pclass_col[0]].map({1: 300, 2: 150, 3: 50}) if pclass_col else 120
         colors = filtered_df[survived_col[0]].map({1: "#fdbb2d", 0: "#ff4e50"}) if survived_col else "#fdbb2d"
         
@@ -335,26 +280,23 @@ with chart_col2:
             s=sizes,  
             c=colors,     
             alpha=0.75, 
-            edgecolors="white",
+            edgecolors="black",
             linewidths=0.8
         )
         
-        # Fixed: Changed text settings and adjusted alpha via native matplotlib attributes
-        ax_bonus.set_xlabel("Passenger Age", fontsize=10, color='white')
-        ax_bonus.set_ylabel("Ticket Fare (£)", fontsize=10, color='white')
-        ax_bonus.tick_params(colors='white')
-        
-        # Fixed: Grid line color structure mapped perfectly to bypass ValueError
-        ax_bonus.grid(True, color='white', alpha=0.15, linestyle='--')
+        ax_bonus.set_xlabel("Passenger Age", fontsize=10, color='#222222')
+        ax_bonus.set_ylabel("Ticket Fare (£)", fontsize=10, color='#222222')
+        ax_bonus.tick_params(colors='#222222')
+        ax_bonus.grid(True, color='#222222', alpha=0.15, linestyle='--')
 
         st.pyplot(fig_bonus)
     else:
         st.info("Required columns (Age/Fare) are missing or empty.")
-        # --- AI Survival Predictor Tool ---
+
+# --- AI Survival Predictor Tool ---
 st.markdown("<span class='section-title'>🤖 AI Executive Decision Tool: Survival Predictor</span>", unsafe_allow_html=True)
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
 
-# User inputs for the AI tool
 st.subheader("Enter Passenger Details to Predict Survival Probability:")
 ai_col1, ai_col2, ai_col3 = st.columns(3)
 
@@ -365,9 +307,7 @@ with ai_col2:
 with ai_col3:
     ai_age = st.slider("Select Age for Prediction:", 1, 80, 30)
 
-# Predictive logic based on historical data patterns
 if st.button("Run AI Survival Prediction 🚀"):
-    # High probability rules based on historical Titanic data
     if ai_gender == "female":
         if ai_class in [1, 2]:
             survival_chance = "HIGH (85% - 95%)"
@@ -375,7 +315,7 @@ if st.button("Run AI Survival Prediction 🚀"):
         else:
             survival_chance = "MEDIUM (50% - 60%)"
             result_color = "orange"
-    else: # male
+    else: 
         if ai_class == 1 and ai_age < 18:
             survival_chance = "MEDIUM (40% - 50%)"
             result_color = "orange"
@@ -384,7 +324,8 @@ if st.button("Run AI Survival Prediction 🚀"):
             result_color = "red"
             
     st.markdown(f"### AI Prediction Result: **Passenger has a <span style='color:{result_color}'>{survival_chance}</span> chance of survival.**", unsafe_allow_html=True)
-    # --- AI Executive Insights Generator ---
+
+# --- AI Executive Insights Generator ---
 st.markdown("<span class='section-title'>🧠 AI Executive Insights Generator</span>", unsafe_allow_html=True)
 
 if st.button("Generate AI Executive Summary ✨"):
