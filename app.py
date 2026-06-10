@@ -193,7 +193,7 @@ pclass = st.sidebar.selectbox("Ticket Class Tier:", ["All"] + [str(c) for c in s
 
 filtered_df = apply_filters(df, gender, pclass)
 
-# --- AUTOMATED ANOMALY & OUTLIER DETECTOR (Robust No-Name Version) ---
+# --- AUTOMATED ANOMALY & OUTLIER DETECTOR (Protected Code Block) ---
 if not filtered_df.empty and fare_c in filtered_df.columns and age_c in filtered_df.columns:
     try:
         valid_fare_df = filtered_df.dropna(subset=[fare_c])
