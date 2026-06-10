@@ -354,9 +354,9 @@ if search_idx:
 
 
 # ==========================================
-# SECTION 3: GRAPHS & ADVANCED VISUALIZATION (سر کی لسٹ کے ناموں کے ساتھ)
+# SECTION 3: GRAPHS & ADVANCED VISUALIZATION
 # ==========================================
-st.markdown("<span class='section-title'>Advanced Data Visualization Grid (10 Unique Charts)</span>", unsafe_allow_html=True)
+st.markdown("<span class='section-title'>Advanced Data Visualization Grid (10 Unique Charts + Bonus)</span>", unsafe_allow_html=True)
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
 
 # --- Row 1: Charts 1 & 2 ---
@@ -407,6 +407,54 @@ with row5_col1:
 with row5_col2:
     st.markdown("<div class='chart-header'>👪 Chart 10: Count Plot of Parent/Children Aboard</div>", unsafe_allow_html=True)
     st.pyplot(ch.draw_parch_count(filtered_df))
+
+# --- Row 6: Bonus Charts Area ---
+st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
+bonus_col1, bonus_col2 = st.columns(2)
+
+with bonus_col1:
+    st.markdown("<div class='chart-header'>🔥 Bonus Chart 1: Survival Distribution Plot (Total Count)</div>", unsafe_allow_html=True)
+    if not filtered_df.empty and survived_c in filtered_df.columns:
+        fig, ax = plt.subplots()
+        fig.patch.set_facecolor('none')  
+        ax.set_facecolor('none')
+        
+        sns.countplot(x=filtered_df[survived_c], palette=["#b80d22", "#2a9d8f"], ax=ax)
+        ax.set_xticklabels(["Deceased (0)", "Survived (1)"])
+        ax.tick_params(colors='#1a1c23')
+        ax.xaxis.label.set_color('#1a1c23')
+        ax.yaxis.label.set_color('#1a1c23')
+        st.pyplot(fig)
+    else:
+        st.info("Survival data column not tracked inside your current dataset.")
+
+with bonus_col2:
+    st.markdown("<div class='chart-header'>🚀 Bonus Chart 2: Executive Multi-Variable Breakdown (Age vs Fare vs Class)</div>", unsafe_allow_html=True)
+    if not filtered_df.empty and age_c in filtered_df.columns and fare_c in filtered_df.columns:
+        fig_bonus, ax_bonus = plt.subplots(figsize=(6, 4))
+        fig_bonus.patch.set_facecolor('none')  
+        ax_bonus.set_facecolor('none')
+        
+        sizes = filtered_df[pclass_c].map({1: 300, 2: 150, 3: 50}) if pclass_c in filtered_df.columns else 120
+        colors = filtered_df[survived_c].map({1: "#fdbb2d", 0: "#ff4e50"}) if survived_c in filtered_df.columns else "#fdbb2d"
+        
+        ax_bonus.scatter(
+            x=filtered_df[age_c], 
+            y=filtered_df[fare_c], 
+            s=sizes,  
+            c=colors,     
+            alpha=0.75, 
+            edgecolors="black",
+            linewidths=0.8
+        )
+        
+        ax_bonus.set_xlabel("Passenger Age", fontsize=10, color='#1a1c23')
+        ax_bonus.set_ylabel("Ticket Fare (£)", fontsize=10, color='#1a1c23')
+        ax_bonus.tick_params(colors='#1a1c23')
+        ax_bonus.grid(True, color='#1a1c23', alpha=0.15, linestyle='--')
+        st.pyplot(fig_bonus)
+    else:
+        st.info("Required columns (Age/Fare) are missing or empty.")
 
 
 # --- DATA EXPORT CENTER ---
