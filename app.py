@@ -345,86 +345,54 @@ if search_idx:
 st.markdown("<span class='section-title'>Advanced Data Visualization Grid (10 Unique Charts)</span>", unsafe_allow_html=True)
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
 
+# --- Row 1: Charts 1 & 2 ---
 row1_col1, row1_col2 = st.columns(2)
 with row1_col1:
+    st.subheader("1. Passenger Distribution by Ticket Class (Bar Chart)")
     st.pyplot(ch.draw_bar_chart(filtered_df))
 with row1_col2:
+    st.subheader("2. Overall Survival vs Fatality Ratio (Pie Chart)")
     st.pyplot(ch.draw_pie_chart(filtered_df))
 
+# --- Row 2: Charts 3 & 4 ---
 row2_col1, row2_col2 = st.columns(2)
 with row2_col1:
+    st.subheader("3. Passenger Age Demographic Density (Distribution Plot)")
     st.pyplot(ch.draw_age_dist(filtered_df))
 with row2_col2:
+    st.subheader("4. Correlation Analysis: Ticket Fare vs Passenger Age (Scatter Plot)")
     st.pyplot(ch.draw_scatter_fare_age(filtered_df))
 
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
 
+# --- Row 3: Charts 5 & 6 ---
 row3_col1, row3_col2 = st.columns(2)
 with row3_col1:
+    st.subheader("5. Survival Rate Analysis by Gender (Categorical Plot)")
     st.pyplot(ch.draw_gender_survival(filtered_df))
 with row3_col2:
+    st.subheader("6. Passenger Count by Port of Embarkation (Count Plot)")
     st.pyplot(ch.draw_embark_count(filtered_df))
 
+# --- Row 4: Charts 7 & 8 ---
 row4_col1, row4_col2 = st.columns(2)
 with row4_col1:
+    st.subheader("7. Fare Range & Outlier Detection by Class (Box Plot)")
     st.pyplot(ch.draw_fare_box(filtered_df))
 with row4_col2:
+    st.subheader("8. Age Spread and Volume by Survival Status (Violin Plot)")
     st.pyplot(ch.draw_age_violin(filtered_df))
 
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
 
+# --- Row 5: Charts 9 & 10 ---
 row5_col1, row5_col2 = st.columns(2)
 with row5_col1:
+    st.subheader("9. Sibling / Spouse Co-traveler Distribution (SibSp Count)")
     st.pyplot(ch.draw_sibsp_count(filtered_df))
 with row5_col2:
+    st.subheader("10. Parent / Children Family Size Distribution (Parch Count)")
     st.pyplot(ch.draw_parch_count(filtered_df))
-
-chart_col1, chart_col2 = st.columns(2)
-
-with chart_col1:
-    st.subheader("Survival Distribution (Count)")
-    if not filtered_df.empty and survived_c in filtered_df.columns:
-        fig, ax = plt.subplots()
-        fig.patch.set_facecolor('none')  
-        ax.set_facecolor('none')
-        
-        sns.countplot(x=filtered_df[survived_c], palette=["#b80d22", "#2a9d8f"], ax=ax)
-        ax.set_xticklabels(["Deceased (0)", "Survived (1)"])
-        ax.tick_params(colors='#1a1c23')
-        ax.xaxis.label.set_color('#1a1c23')
-        ax.yaxis.label.set_color('#1a1c23')
-        st.pyplot(fig)
-    else:
-        st.info("Survival data column not tracked inside your current dataset.")
-
-with chart_col2:
-    st.subheader("Bonus Bubble Chart: Age vs Fare")
-    if not filtered_df.empty and age_c in filtered_df.columns and fare_c in filtered_df.columns:
-        fig_bonus, ax_bonus = plt.subplots(figsize=(6, 4))
-        fig_bonus.patch.set_facecolor('none')  
-        ax_bonus.set_facecolor('none')
-        
-        sizes = filtered_df[pclass_c].map({1: 300, 2: 150, 3: 50}) if pclass_c in filtered_df.columns else 120
-        colors = filtered_df[survived_c].map({1: "#fdbb2d", 0: "#ff4e50"}) if survived_c in filtered_df.columns else "#fdbb2d"
-        
-        ax_bonus.scatter(
-            x=filtered_df[age_c], 
-            y=filtered_df[fare_c], 
-            s=sizes,  
-            c=colors,     
-            alpha=0.75, 
-            edgecolors="black",
-            linewidths=0.8
-        )
-        
-        ax_bonus.set_xlabel("Passenger Age", fontsize=10, color='#1a1c23')
-        ax_bonus.set_ylabel("Ticket Fare (£)", fontsize=10, color='#1a1c23')
-        ax_bonus.tick_params(colors='#1a1c23')
-        ax_bonus.grid(True, color='#1a1c23', alpha=0.15, linestyle='--')
-
-        st.pyplot(fig_bonus)
-    else:
-        st.info("Required columns (Age/Fare) are missing or empty.")
 
 
 # --- DATA EXPORT CENTER ---
