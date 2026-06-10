@@ -180,25 +180,40 @@ Designed for decision-makers to transform raw historical data into structured, a
 
 df = pd.read_csv('data/titanic.csv')
 
+# --- DYNAMIC COLUMN NAME DETECTOR (To prevent KeyError case-sensitivity issues) ---
+col_map = {c.lower(): c for c in df.columns}
+fare_c = col_map.get('fare', 'fare')
+age_c = col_map.get('age', 'age')
+name_c = col_map.get('name', 'name')
+sex_c = col_map.get('sex', 'sex')
+pclass_c = col_map.get('pclass', 'pclass')
+survived_c = col_map.get('survived', 'survived')
+
 # Sidebar Controls Layout
 st.sidebar.markdown("<span class='sidebar-global-heading'>Global Filters</span>", unsafe_allow_html=True)
-gender = st.sidebar.selectbox("Passenger Gender Selection:", ["All"] + list(df['sex'].unique()))
-pclass = st.sidebar.selectbox("Ticket Class Tier:", ["All"] + [str(c) for c in sorted(df['pclass'].unique())])
+gender = st.sidebar.selectbox("Passenger Gender Selection:", ["All"] + list(df[sex_c].unique()))
+pclass = st.sidebar.selectbox("Ticket Class Tier:", ["All"] + [str(c) for c in sorted(df[pclass_c].unique())])
 
 filtered_df = apply_filters(df, gender, pclass)
 
-# --- FIXED FACTOR 1: 💡 AUTOMATED ANOMALY & OUTLIER DETECTOR (With Empty Check) ---
-if not filtered_df.empty:
-    max_fare_row = filtered_df.loc[filtered_df['fare'].idxmax()]
-    max_age_row = filtered_df.loc[filtered_df['age'].idxmax()]
-    
-    st.markdown(f"""
-    <div class='anomaly-box'>
-        <strong>⚠️ Executive Intelligence Alerts (Outlier Analysis):</strong><br>
-        • 💸 <b>Highest Fare in Selection:</b> <i>{max_fare_row['name']}</i> paid an extraordinary amount of <b>${max_fare_row['fare']:.2f}</b>.<br>
-        • 🧓 <b>Oldest Passenger in Selection:</b> <i>{max_age_row['name']}</i> logged at <b>{max_age_row['age']:.1f} years old</b>.
-    </div>
-    """, unsafe_allow_html=True)
+# --- FIXED FACTOR 1: 💡 AUTOMATED ANOMALY & OUTLIER DETECTOR ---
+if not filtered_df.empty and fare_c in filtered_df.columns and age_c in filtered_df.columns:
+    try:
+        max_fare_row = filtered_df.loc[filtered_df[fare_c].idxmax()]
+        max_age_row = filtered_df.loc[filtered_df[age_c].idxmax()]
+        
+        passenger_max_fare = max_fare_row[name_c] if name_c in max_fare_row else "Unknown Passenger"
+        passenger_max_age = max_age_row[name_c] if name_c in max_age_row else "Unknown Passenger"
+        
+        st.markdown(f"""
+        <div class='anomaly-box'>
+            <strong>⚠️ Executive Intelligence Alerts (Outlier Analysis):</strong><br>
+            • 💸 <b>Highest Fare in Selection:</b> <i>{passenger_max_fare}</i> paid an extraordinary amount of <b>${max_fare_row[fare_c]:.2f}</b>.<br>
+            • 🧓 <b>Oldest Passenger in Selection:</b> <i>{passenger_max_age}</i> logged at <b>{max_age_row[age_c]:.1f} years old</b>.
+        </div>
+        """, unsafe_allow_html=True)
+    except Exception as e:
+        st.info("💡 Calculating current matrix overview filters...")
 else:
     st.warning("⚠️ Selected filter combination returned no passenger records. Please adjust your sidebar filters.")
 
@@ -210,10 +225,10 @@ col_kpi1, col_kpi2, col_kpi3 = st.columns(3)
 with col_kpi1:
     st.metric(label="Total Analyzed Passengers", value=f"{len(filtered_df):,}")
 with col_kpi2:
-    avg_fare = filtered_df['fare'].mean() if not filtered_df.empty else 0
+    avg_fare = filtered_df[fare_c].mean() if not filtered_df.empty and fare_c in filtered_df.columns else 0
     st.metric(label="Average Fare Paid", value=f"${avg_fare:.2f}")
 with col_kpi3:
-    avg_age = filtered_df['age'].mean() if not filtered_df.empty else 0
+    avg_age = filtered_df[age_c].mean() if not filtered_df.empty and age_c in filtered_df.columns else 0
     st.metric(label="Average Passenger Age", value=f"{avg_age:.1f} Yrs")
 
 # Charts Data Grid Panels Layout
@@ -258,14 +273,12 @@ chart_col1, chart_col2 = st.columns(2)
 
 with chart_col1:
     st.subheader("Survival Distribution (Count)")
-    surv_check = [c for c in filtered_df.columns if c.lower() == 'survived']
-    
-    if not filtered_df.empty and surv_check:
+    if not filtered_df.empty and survived_c in filtered_df.columns:
         fig, ax = plt.subplots()
         fig.patch.set_facecolor('none')  
         ax.set_facecolor('none')
         
-        sns.countplot(x=filtered_df[surv_check[0]], palette=["#b80d22", "#2a9d8f"], ax=ax)
+        sns.countplot(x=filtered_df[survived_c], palette=["#b80d22", "#2a9d8f"], ax=ax)
         ax.set_xticklabels(["Deceased (0)", "Survived (1)"])
         ax.tick_params(colors='#1a1c23')
         ax.xaxis.label.set_color('#1a1c23')
@@ -276,22 +289,17 @@ with chart_col1:
 
 with chart_col2:
     st.subheader("Bonus Bubble Chart: Age vs Fare")
-    age_col = [c for c in filtered_df.columns if c.lower() == 'age']
-    fare_col = [c for c in filtered_df.columns if c.lower() == 'fare']
-    pclass_col = [c for c in filtered_df.columns if c.lower() == 'pclass']
-    survived_col = [c for c in filtered_df.columns if c.lower() == 'survived']
-
-    if not filtered_df.empty and age_col and fare_col:
+    if not filtered_df.empty and age_c in filtered_df.columns and fare_c in filtered_df.columns:
         fig_bonus, ax_bonus = plt.subplots(figsize=(6, 4))
         fig_bonus.patch.set_facecolor('none')  
         ax_bonus.set_facecolor('none')
         
-        sizes = filtered_df[pclass_col[0]].map({1: 300, 2: 150, 3: 50}) if pclass_col else 120
-        colors = filtered_df[survived_col[0]].map({1: "#fdbb2d", 0: "#ff4e50"}) if survived_col else "#fdbb2d"
+        sizes = filtered_df[pclass_c].map({1: 300, 2: 150, 3: 50}) if pclass_c in filtered_df.columns else 120
+        colors = filtered_df[survived_c].map({1: "#fdbb2d", 0: "#ff4e50"}) if survived_c in filtered_df.columns else "#fdbb2d"
         
         ax_bonus.scatter(
-            x=filtered_df[age_col[0]], 
-            y=filtered_df[fare_col[0]], 
+            x=filtered_df[age_c], 
+            y=filtered_df[fare_c], 
             s=sizes,  
             c=colors,     
             alpha=0.75, 
@@ -358,26 +366,24 @@ st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div
 search_name = st.text_input("Enter Passenger Name to Query Dataset (e.g., Owen, Braund, Cumings):")
 
 if search_name:
-    name_col = [c for c in df.columns if c.lower() == 'name']
-    
-    if name_col:
-        search_results = df[df[name_col[0]].str.contains(search_name, case=False, na=False)]
+    if name_c in df.columns:
+        search_results = df[df[name_c].str.contains(search_name, case=False, na=False)]
         
         if not search_results.empty:
             st.success(f"Found {len(search_results)} passenger(s) matching '{search_name}':")
             
             for idx, row in search_results.iterrows():
                 with st.container():
-                    st.markdown(f"#### 👤 {row[name_col[0]]}")
+                    st.markdown(f"#### 👤 {row[name_c]}")
                     col1, col2, col3, col4 = st.columns(4)
                     
-                    survived_val = row.get('survived', row.get('Survived', 'N/A'))
+                    survived_val = row.get(survived_c, 'N/A')
                     status = "🟢 Survived" if survived_val == 1 else "🔴 Deceased" if survived_val == 0 else "Unknown"
                     
-                    gender_val = row.get('sex', row.get('Sex', 'N/A')).capitalize()
-                    class_val = row.get('pclass', row.get('Pclass', 'N/A'))
-                    age_val = row.get('age', row.get('Age', 'N/A'))
-                    fare_val = row.get('fare', row.get('Fare', 'N/A'))
+                    gender_val = str(row.get(sex_c, 'N/A')).capitalize()
+                    class_val = row.get(pclass_c, 'N/A')
+                    age_val = row.get(age_c, 'N/A')
+                    fare_val = row.get(fare_c, 'N/A')
                     
                     with col1:
                         st.markdown(f"**Status:** {status}")
