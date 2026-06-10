@@ -6,7 +6,7 @@ def apply_chart_style(fig, ax, title, xlabel="", ylabel=""):
     ax.set_facecolor('#161b22')
     
     # Graphs Titles: Forced to Red-Pink-Orange mix color scheme
-    ax.set_title(title, fontsize=14, fontweight='bold', pad=15, color='#ff007f', 
+    ax.set_title(title, fontsize=12, fontweight='bold', pad=25, color='#ff007f', 
                  bbox=dict(facecolor='none', edgecolor='#ff4500', pad=4, linewidth=1)) 
     
     if xlabel: ax.set_xlabel(xlabel, fontsize=10, color='#ff3333', labelpad=8, fontweight='bold')
@@ -37,6 +37,11 @@ def draw_pie_chart(df):
         ax.pie(counts, autopct='%1.1f%%', startangle=90, colors=colors, labels=labels, 
                textprops=dict(color="#ffffff", weight="bold", fontsize=10),
                wedgeprops=dict(width=0.45, edgecolor='#0e1117', linewidth=3))
+    
+    # Adding clear color guide line at the top
+    ax.text(0.5, 1.15, "🔴 Red = Deceased | 💗 Pink = Survived", 
+            transform=ax.transAxes, color='#ffffff', fontsize=9, weight='bold', ha='center')
+    
     apply_chart_style(fig, ax, 'Survival Rate Status')
     return fig
 
@@ -53,9 +58,19 @@ def draw_age_dist(df):
 def draw_scatter_fare_age(df):
     fig, ax = plt.subplots(figsize=(6, 4))
     if not df.empty:
-        sns.scatterplot(data=df, x='age', y='fare', hue='survived', ax=ax, palette=['#ffb703', '#1f77b4'], alpha=0.9, s=55, edgecolor='#ffffff')
+        # Check column cases dynamically
+        surv_col = 'survived' if 'survived' in df.columns else ('Survived' if 'Survived' in df.columns else None)
+        age_col = 'age' if 'age' in df.columns else ('Age' if 'Age' in df.columns else 'age')
+        fare_col = 'fare' if 'fare' in df.columns else ('Fare' if 'Fare' in df.columns else 'fare')
+        
+        sns.scatterplot(data=df, x=age_col, y=fare_col, hue=surv_col, ax=ax, palette=['#ffb703', '#1f77b4'], alpha=0.9, s=55, edgecolor='#ffffff')
         legend = ax.legend(title='Status', facecolor='#0e1117', edgecolor='none')
         plt.setp(legend.get_texts(), color='#8b949e')
+    
+    # Adding clear color guide line at the top
+    ax.text(0.5, 1.03, "🟡 Yellow = Deceased (0) | 🔵 Blue = Survived (1)", 
+            transform=ax.transAxes, color='#ffffff', fontsize=9, weight='bold', ha='center')
+            
     apply_chart_style(fig, ax, 'Passenger Fare vs Age', 'Age', 'Fare')
     return fig
 
@@ -65,13 +80,22 @@ def draw_gender_survival(df):
         sns.countplot(data=df, x='sex', hue='survived', ax=ax, palette=['#00f5d4', '#ffb703'], edgecolor='#ffffff', linewidth=0.8)
         legend = ax.legend(labels=['Deceased', 'Survived'], facecolor='#0e1117', edgecolor='none')
         plt.setp(legend.get_texts(), color='#8b949e')
+        
+    # Adding clear color guide line at the top
+    ax.text(0.5, 1.03, "🟢 Teal = Deceased (0) | 🟡 Yellow = Survived (1)", 
+            transform=ax.transAxes, color='#ffffff', fontsize=9, weight='bold', ha='center')
+            
     apply_chart_style(fig, ax, 'Survival Count by Gender', 'Gender', 'Count')
     return fig
 
 def draw_embark_count(df):
     fig, ax = plt.subplots(figsize=(6, 4))
-    if not df.empty and 'embarked' in df.columns:
-        sns.countplot(data=df, x='embarked', ax=ax, palette=['#ff3333', '#ff007f', '#ff758f'], edgecolor='#ffffff')
+    
+    # Support both 'embarked' or 'embark_town' columns safely
+    emb_col = 'embarked' if 'embarked' in df.columns else ('embark_town' if 'embark_town' in df.columns else None)
+    
+    if not df.empty and emb_col:
+        sns.countplot(data=df, x=emb_col, ax=ax, palette=['#ff3333', '#ff007f', '#ff758f'], edgecolor='#ffffff')
     apply_chart_style(fig, ax, 'Passengers per Embarkation Port', 'Port of Embarkation', 'Count')
     return fig
 
@@ -88,6 +112,11 @@ def draw_age_violin(df):
         sns.violinplot(data=df, x='pclass', y='age', hue='survived', split=True, ax=ax, palette=['#ff007f', '#ffb703'], inner="quart")
         legend = ax.legend(facecolor='#0e1117', edgecolor='none')
         plt.setp(legend.get_texts(), color='#8b949e')
+        
+    # Adding clear color guide line at the top
+    ax.text(0.5, 1.03, "💗 Pink = Deceased (0) | 🟡 Yellow = Survived (1)", 
+            transform=ax.transAxes, color='#ffffff', fontsize=9, weight='bold', ha='center')
+            
     apply_chart_style(fig, ax, 'Age Distribution by Class & Survival', 'Ticket Class', 'Age')
     return fig
 
@@ -104,24 +133,30 @@ def draw_parch_count(df):
         sns.countplot(data=df, x='parch', ax=ax, color='#ffb703', edgecolor='#1f77b4', linewidth=1.5, alpha=0.9)
     apply_chart_style(fig, ax, 'Number of Parents/Children Aboard', 'Parch Count', 'Passenger Count')
     return fig
+
 def draw_bonus_bubble_chart(df):
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    
     fig, ax = plt.subplots(figsize=(6, 4))
-    scatter = ax.scatter(
-        x=df['Age'], 
-        y=df['Fare'], 
-        s=df['Pclass'] * 50,  
-        c=df['Survived'],     
-        cmap='coolwarm', 
-        alpha=0.6, 
-        edgecolors="white"
-    )
-    ax.set_title("Bonus Chart: Age vs Fare (Bubble Size by Pclass)", fontsize=12, fontweight='bold', color='#1e3d59')
-    ax.set_xlabel("Passenger Age", fontsize=10)
-    ax.set_ylabel("Ticket Fare", fontsize=10)
-    ax.grid(True, linestyle='--', alpha=0.5)
     
+    # Align capitalization variant keys dynamically
+    age_col = 'Age' if 'Age' in df.columns else 'age'
+    fare_col = 'Fare' if 'Fare' in df.columns else 'fare'
+    pclass_col = 'Pclass' if 'Pclass' in df.columns else 'pclass'
+    surv_col = 'Survived' if 'Survived' in df.columns else 'survived'
+    
+    if not df.empty:
+        scatter = ax.scatter(
+            x=df[age_col], 
+            y=df[fare_col], 
+            s=df[pclass_col] * 50,  
+            c=df[surv_col],     
+            cmap='coolwarm', 
+            alpha=0.6, 
+            edgecolors="white"
+        )
+        
+    # Adding clear color guide line at the top for cold-warm logic
+    ax.text(0.5, 1.03, "💙 Blue Tone = Deceased (0) | ❤️ Red Tone = Survived (1)", 
+            transform=ax.transAxes, color='#ffffff', fontsize=9, weight='bold', ha='center')
+            
+    apply_chart_style(fig, ax, "Bonus Chart: Age vs Fare (Bubble Size by Pclass)", "Passenger Age", "Ticket Fare")
     return fig
-  
