@@ -187,7 +187,7 @@ pclass = st.sidebar.selectbox("Ticket Class Tier:", ["All"] + [str(c) for c in s
 
 filtered_df = apply_filters(df, gender, pclass)
 
-# --- FACTOR 1: 💡 AUTOMATED ANOMALY & OUTLIER DETECTOR ---
+# --- FIXED FACTOR 1: 💡 AUTOMATED ANOMALY & OUTLIER DETECTOR (With Empty Check) ---
 if not filtered_df.empty:
     max_fare_row = filtered_df.loc[filtered_df['fare'].idxmax()]
     max_age_row = filtered_df.loc[filtered_df['age'].idxmax()]
@@ -199,6 +199,8 @@ if not filtered_df.empty:
         • 🧓 <b>Oldest Passenger in Selection:</b> <i>{max_age_row['name']}</i> logged at <b>{max_age_row['age']:.1f} years old</b>.
     </div>
     """, unsafe_allow_html=True)
+else:
+    st.warning("⚠️ Selected filter combination returned no passenger records. Please adjust your sidebar filters.")
 
 # Metrics Grid Display Block
 st.markdown("<span class='section-title'>Key Performance Indicators (KPIs)</span>", unsafe_allow_html=True)
