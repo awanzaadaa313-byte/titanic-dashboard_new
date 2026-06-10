@@ -178,16 +178,13 @@ Designed for decision-makers to transform raw historical data into structured, a
 
 df = pd.read_csv('data/titanic.csv')
 
-# --- SMART COLUMN DETECTOR (Finds names even if column is 'PassengerName', 'full_name' etc.) ---
+# --- DYNAMIC COLUMN NAME DETECTOR ---
 col_map = {c.lower(): c for c in df.columns}
 fare_c = col_map.get('fare', 'fare')
 age_c = col_map.get('age', 'age')
 sex_c = col_map.get('sex', 'sex')
 pclass_c = col_map.get('pclass', 'pclass')
 survived_c = col_map.get('survived', 'survived')
-
-# Automatically find any column that contains 'name'
-name_c = next((c for c in df.columns if 'name' in c.lower()), None)
 
 # Sidebar Controls Layout
 st.sidebar.markdown("<span class='sidebar-global-heading'>Global Filters</span>", unsafe_allow_html=True)
@@ -196,23 +193,37 @@ pclass = st.sidebar.selectbox("Ticket Class Tier:", ["All"] + [str(c) for c in s
 
 filtered_df = apply_filters(df, gender, pclass)
 
-# --- AUTOMATED ANOMALY & OUTLIER DETECTOR ---
+# --- AUTOMATED ANOMALY & OUTLIER DETECTOR (Robust No-Name Version) ---
 if not filtered_df.empty and fare_c in filtered_df.columns and age_c in filtered_df.columns:
     try:
-        max_fare_row = filtered_df.loc[filtered_df[fare_c].idxmax()]
-        max_age_row = filtered_df.loc[filtered_df[age_c].idxmax()]
+        valid_fare_df = filtered_df.dropna(subset=[fare_c])
+        valid_age_df = filtered_df.dropna(subset=[age_c])
         
-        # Display name if column found, otherwise show cleaner identifier
-        passenger_max_fare = max_fare_row[name_c] if name_c else f"Passenger ID {max_fare_row.name}"
-        passenger_max_age = max_age_row[name_c] if name_c else f"Passenger ID {max_age_row.name}"
+        alerts = []
+        if not valid_fare_df.empty:
+            max_fare_row = valid_fare_df.loc[valid_fare_df[fare_c].idxmax()]
+            p_sex = str(max_fare_row.get(sex_c, 'passenger')).lower()
+            p_class = max_fare_row.get(pclass_c, 'N/A')
+            p_idx = max_fare_row.name
+            alerts.append(f"• 💸 <b>Highest Fare in Selection:</b> A <b>{p_sex}</b> passenger in <b>Class {p_class}</b> (Row {p_idx}) paid an extraordinary amount of <b>${max_fare_row[fare_c]:.2f}</b>.")
         
-        st.markdown(f"""
-        <div class='anomaly-box'>
-            <strong>⚠️ Executive Intelligence Alerts (Outlier Analysis):</strong><br>
-            • 💸 <b>Highest Fare in Selection:</b> <i>{passenger_max_fare}</i> paid an extraordinary amount of <b>${max_fare_row[fare_c]:.2f}</b>.<br>
-            • 🧓 <b>Oldest Passenger in Selection:</b> <i>{passenger_max_age}</i> logged at <b>{max_age_row[age_c]:.1f} years old</b>.
-        </div>
-        """, unsafe_allow_html=True)
+        if not valid_age_df.empty:
+            max_age_row = valid_age_df.loc[valid_age_df[age_c].idxmax()]
+            p_sex = str(max_age_row.get(sex_c, 'passenger')).lower()
+            p_class = max_age_row.get(pclass_c, 'N/A')
+            p_idx = max_age_row.name
+            alerts.append(f"• 🧓 <b>Oldest Passenger in Selection:</b> A <b>{p_sex}</b> passenger in <b>Class {p_class}</b> (Row {p_idx}) logged at <b>{max_age_row[age_c]:.1f} years old</b>.")
+        
+        if alerts:
+            alert_html = "<br>".join(alerts)
+            st.markdown(f"""
+            <div class='anomaly-box'>
+                <strong>⚠️ Executive Intelligence Alerts (Outlier Analysis):</strong><br>
+                {alert_html}
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.info("💡 Calculating current matrix overview filters...")
     except Exception as e:
         st.info("💡 Calculating current matrix overview filters...")
 else:
@@ -360,45 +371,50 @@ if st.button("Generate AI Executive Summary ✨"):
     3. **Risk Factor:** Lone passengers aged between 20-40 in lower tiers carried the maximum fatality weight in this disaster.
     """)
 
-# --- Executive Passenger Search Engine ---
-st.markdown("<span class='section-title'>🔍 Executive Passenger Search Engine</span>", unsafe_allow_html=True)
+# --- Executive Passenger Record Explorer (Optimized for No-Name Dataset) ---
+st.markdown("<span class='section-title'>🔍 Executive Passenger Record Explorer</span>", unsafe_allow_html=True)
 st.markdown("<div class='heading-line-1'></div><div class='heading-line-2'></div>", unsafe_allow_html=True)
 
-search_name = st.text_input("Enter Passenger Name to Query Dataset (e.g., Owen, Braund, Cumings):")
+search_idx = st.text_input("Enter Passenger Row ID to Query Dataset (e.g., 0, 14, 50, 100):")
 
-if search_name:
-    if name_c:
-        search_results = df[df[name_c].str.contains(search_name, case=False, na=False)]
-        
-        if not search_results.empty:
-            st.success(f"Found {len(search_results)} passenger(s) matching '{search_name}':")
+if search_idx:
+    try:
+        idx_int = int(search_idx)
+        if idx_int in df.index:
+            row = df.loc[idx_int]
+            st.success(f"Found Record for Passenger Row ID: {idx_int}")
             
-            for idx, row in search_results.iterrows():
-                with st.container():
-                    st.markdown(f"#### 👤 {row[name_c]}")
-                    col1, col2, col3, col4 = st.columns(4)
-                    
-                    survived_val = row.get(survived_c, 'N/A')
-                    status = "🟢 Survived" if survived_val == 1 else "🔴 Deceased" if survived_val == 0 else "Unknown"
-                    
-                    gender_val = str(row.get(sex_c, 'N/A')).capitalize()
-                    class_val = row.get(pclass_c, 'N/A')
-                    age_val = row.get(age_c, 'N/A')
-                    fare_val = row.get(fare_c, 'N/A')
-                    
-                    with col1:
-                        st.markdown(f"**Status:** {status}")
-                    with col2:
-                        st.markdown(f"**Gender / Age:** {gender_val} / {age_val} Yrs")
-                    with col3:
-                        st.markdown(f"**Ticket Class:** Class {class_val}")
-                    with col4:
-                        st.markdown(f"**Fare Paid:** ${fare_val:.2f}" if isinstance(fare_val, (int, float)) else f"**Fare Paid:** {fare_val}")
-                    st.markdown("<hr style='margin: 10px 0; border-color: rgba(0,0,0,0.1);'>", unsafe_allow_html=True)
+            with st.container():
+                st.markdown(f"#### 👤 Passenger Record #{idx_int}")
+                col1, col2, col3, col4 = st.columns(4)
+                
+                survived_val = row.get(survived_c, 'N/A')
+                status = "🟢 Survived" if survived_val == 1 else "🔴 Deceased" if survived_val == 0 else "Unknown"
+                
+                gender_val = str(row.get(sex_c, 'N/A')).capitalize()
+                class_val = row.get(pclass_c, 'N/A')
+                age_val = row.get(age_c, 'N/A')
+                fare_val = row.get(fare_c, 'N/A')
+                who_val = str(row.get('who', 'N/A')).capitalize()
+                embark_val = str(row.get('embark_town', 'N/A'))
+                
+                with col1:
+                    st.markdown(f"**Status:** {status}")
+                    st.markdown(f"**Demographic:** {who_val}")
+                with col2:
+                    st.markdown(f"**Gender:** {gender_val}")
+                    st.markdown(f"**Age:** {age_val} Yrs")
+                with col3:
+                    st.markdown(f"**Ticket Class:** Class {class_val}")
+                    st.markdown(f"**Embarked From:** {embark_val}")
+                with col4:
+                    st.markdown(f"**Fare Paid:** ${fare_val:.2f}" if isinstance(fare_val, (int, float)) else f"**Fare Paid:** {fare_val}")
+                    st.markdown(f"**Family:** SibSp: {row.get('sibsp',0)}, Parch: {row.get('parch',0)}")
+                st.markdown("<hr style='margin: 10px 0; border-color: rgba(0,0,0,0.1);'>", unsafe_allow_html=True)
         else:
-            st.warning(f"No records found for passenger named '{search_name}'. Try another query.")
-    else:
-        st.error("The dataset does not contain a 'name' tracking column.")
+            st.warning(f"No records found for Row ID {idx_int}. Valid range is 0 to {df.index.max()}.")
+    except ValueError:
+        st.error("Please enter a valid numeric Row ID.")
 
 # --- FACTOR 2: 📥 LIVE INTERACTIVE DATA EXPORT TOOL ---
 st.markdown("<span class='section-title'>📥 Executive Data Export Center</span>", unsafe_allow_html=True)
